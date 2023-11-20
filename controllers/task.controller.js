@@ -1,0 +1,135 @@
+const createError = require("http-errors");
+const Task = require("../models/Task");
+
+// GET
+
+module.exports.getAllTasks = async (req, res, next) => {
+  try {
+    const tasks = await Task.find();
+    if (tasks.length === 0) {
+      next(createError(204, "No content"));
+    }
+    if (!tasks) {
+      next(createError(400, "Bad request"));
+    }
+    res.status(200).send({ data: tasks });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.getTaskById = async (req, res, next) => {
+  try {
+    const {
+      params: { taskId },
+    } = req;
+    const task = await Task.findById(taskId);
+    if (!task) {
+      next(createError(404, "Not found"));
+    }
+    res.status(200).send({ data: task });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.getDoneTasksV1 = async (req, res, next) => {
+  try {
+    const tasks = await Task.find({ isDone: true });
+    if (tasks.length === 0) {
+      next(createError(204, "No content"));
+    }
+    if (!tasks) {
+      next(createError(400, "Bad request"));
+    }
+    res.status(200).send({ data: tasks });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.getDoneTasksV2 = async (req, res, next) => {
+  try {
+    const {
+      query: { isDone },
+    } = req;
+    const tasks = await Task.find({ isDone });
+    if (tasks.length === 0) {
+      next(createError(204, "No content"));
+    }
+    if (!tasks) {
+      next(createError(400, "Bad request"));
+    }
+    res.status(200).send({ data: tasks });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.getBobsDoneTasks = async (req, res, next) => {
+  try {
+    const tasks = await Task.find({ isDone: true, "owner.name": "Bob" });
+    if (tasks.length === 0) {
+      next(createError(204, "No content"));
+    }
+    if (!tasks) {
+      next(createError(400, "Bad request"));
+    }
+    res.status(200).send({ data: tasks });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// POST
+
+module.exports.createTask = async (req, res, next) => {
+  try {
+    const { body } = req;
+    const newTask = await Task.create(body);
+    if (!newTask) {
+      next(createError(400, "Bad request"));
+    }
+    res.status(201).send({ data: newTask });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// PATCH
+
+module.exports.updateTaskById = async (req, res, next) => {
+  try {
+    const {
+      params: { taskId },
+      body,
+    } = req;
+    const updatedTask = await Task.findByIdAndUpdate(taskId, body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!updatedTask) {
+      next(createError(400, "Bad request"));
+    }
+    res.status(200).send({ data: updatedTask });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// DELETE
+
+module.exports.deleteTaskById = async (req, res, next) => {
+  try {
+    const {
+      params: { taskId },
+    } = req;
+    const task = await Task.findByIdAndDelete(taskId);
+    if (!task) {
+      next(createError(404, "Not found"));
+    }
+    res.status(200).send({ data: task });
+  } catch (error) {
+    next(error);
+  }
+};
