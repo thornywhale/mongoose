@@ -1,10 +1,11 @@
 const http = require("http");
 const app = require("./app");
-
 const mongoose = require("mongoose");
 
+const { DOMAIN, MONGO_PORT, MONGO_DB } = require("./constants");
+
 mongoose
-  .connect("mongodb://localhost:27017/mongoose1")
+  .connect(`mongodb://${DOMAIN}:${MONGO_PORT}/${MONGO_DB}`)
   .catch((error) => console.log(error));
 
 const server = http.createServer(app);
