@@ -2,7 +2,7 @@ POST http://localhost:3000/tasks HTTP/1.1
 Content-Type: application/json
 
 {
-  "content":"task 1",
+  "content":"task 2",
   "deadline": "2024-01-10",
   "owner": {
     "name": "Bob",

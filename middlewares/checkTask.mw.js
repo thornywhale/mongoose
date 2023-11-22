@@ -1,5 +1,5 @@
 const createError = require("http-errors");
-const Task = require("../models/Task");
+const { Task } = require("../models");
 
 module.exports.checkTask = async (req, res, next) => {
   try {

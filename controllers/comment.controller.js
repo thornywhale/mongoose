@@ -1,87 +1,40 @@
 const createError = require("http-errors");
-const Comment = require("../models/Comment");
-const Task = require("../models/Task");
-// const { Comment, Task } = require("../models");
+const { Task, Comment } = require("../models");
 
 // GET
 
-// module.exports.getAllTasks = async (req, res, next) => {
-//   try {
-//     const tasks = await Task.find();
-//     if (tasks.length === 0) {
-//       return next(createError(204, "No content"));
-//     }
-//     if (!tasks) {
-//       return next(createError(400, "Bad request"));
-//     }
-//     res.status(200).send({ data: tasks });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+module.exports.getAllTaskComments = async (req, res, next) => {
+  try {
+    const {
+      params: { taskId },
+    } = req;
+    const comments = await Comment.find({ taskId });
+    if (comments.length === 0) {
+      return next(createError(204, "No content"));
+    }
+    if (!comments) {
+      return next(createError(400, "Bad request"));
+    }
+    res.status(200).send({ data: comments });
+  } catch (error) {
+    next(error);
+  }
+};
 
-// module.exports.getTaskById = async (req, res, next) => {
-//   try {
-//     const {
-//       params: { taskId },
-//     } = req;
-//     const task = await Task.findById(taskId);
-//     if (!task) {
-//       return next(createError(404, "Not found"));
-//     }
-//     res.status(200).send({ data: task });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// module.exports.getDoneTasksV1 = async (req, res, next) => {
-//   try {
-//     const tasks = await Task.find({ isDone: true });
-//     if (tasks.length === 0) {
-//       return next(createError(204, "No content"));
-//     }
-//     if (!tasks) {
-//       return next(createError(400, "Bad request"));
-//     }
-//     res.status(200).send({ data: tasks });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// module.exports.getDoneTasksV2 = async (req, res, next) => {
-//   try {
-//     const {
-//       query: { isDone },
-//     } = req;
-//     const tasks = await Task.find({ isDone });
-//     if (tasks.length === 0) {
-//       return next(createError(204, "No content"));
-//     }
-//     if (!tasks) {
-//       return next(createError(400, "Bad request"));
-//     }
-//     res.status(200).send({ data: tasks });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// module.exports.getBobsDoneTasks = async (req, res, next) => {
-//   try {
-//     const tasks = await Task.find({ isDone: true, "owner.name": "Bob" });
-//     if (tasks.length === 0) {
-//       return next(createError(204, "No content"));
-//     }
-//     if (!tasks) {
-//       return next(createError(400, "Bad request"));
-//     }
-//     res.status(200).send({ data: tasks });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+module.exports.getCommentById = async (req, res, next) => {
+  try {
+    const {
+      params: { commentId },
+    } = req;
+    const task = await Comment.findById(commentId);
+    if (!task) {
+      return next(createError(404, "Not found"));
+    }
+    res.status(200).send({ data: task });
+  } catch (error) {
+    next(error);
+  }
+};
 
 // POST
 
@@ -106,38 +59,43 @@ module.exports.createComment = async (req, res, next) => {
 
 // PATCH
 
-// module.exports.updateTaskById = async (req, res, next) => {
-//   try {
-//     const {
-//       params: { taskId },
-//       body,
-//     } = req;
-//     const updatedTask = await Task.findByIdAndUpdate(taskId, body, {
-//       new: true,
-//       runValidators: true,
-//     });
-//     if (!updatedTask) {
-//       return next(createError(400, "Bad request"));
-//     }
-//     res.status(200).send({ data: updatedTask });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+module.exports.updateCommentById = async (req, res, next) => {
+  try {
+    const {
+      params: { commentId },
+      body,
+    } = req;
+    const updatedComment = await Comment.findByIdAndUpdate(commentId, body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!updatedComment) {
+      return next(createError(400, "Bad request"));
+    }
+    res.status(200).send({ data: updatedComment });
+  } catch (error) {
+    next(error);
+  }
+};
 
 // DELETE
 
-// module.exports.deleteTaskById = async (req, res, next) => {
-//   try {
-//     const {
-//       params: { taskId },
-//     } = req;
-//     const task = await Task.findByIdAndDelete(taskId);
-//     if (!task) {
-//       return next(createError(404, "Not found"));
-//     }
-//     res.status(200).send({ data: task });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+module.exports.deleteCommentById = async (req, res, next) => {
+  try {
+    const {
+      params: { taskId, commentId },
+      taskInstance,
+    } = req;
+    const updatedComments = taskInstance.comments.filter(
+      (comm) => comm._id != commentId
+    );
+    await Task.findByIdAndUpdate(taskId, { comments: updatedComments });
+    const deletedComment = await Comment.findByIdAndDelete(commentId);
+    if (!deletedComment) {
+      return next(createError(404, "Not exists"));
+    }
+    res.status(200).send({ data: deletedComment });
+  } catch (error) {
+    next(error);
+  }
+};

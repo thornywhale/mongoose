@@ -1,0 +1,1 @@
+# Rename file .example.env as .env before start

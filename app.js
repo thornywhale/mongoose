@@ -27,10 +27,17 @@ app.route("/done-tasks/bob").get(TaskController.getBobsDoneTasks);
 
 // COMMENTS
 
+app.route("/comments/:commentId").get(CommentController.getCommentById);
 app
   .route("/tasks/:taskId/comments")
   .all(checkTask)
+  .get(CommentController.getAllTaskComments)
   .post(CommentController.createComment);
+app
+  .route("/tasks/:taskId/comments/:commentId")
+  .all(checkTask)
+  .patch(CommentController.updateCommentById)
+  .delete(CommentController.deleteCommentById);
 
 // -----
 

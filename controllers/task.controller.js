@@ -1,6 +1,5 @@
 const createError = require("http-errors");
-const Task = require("../models/Task");
-const Comment = require("../models/Comment");
+const { Task, Comment } = require("../models");
 
 // GET
 
